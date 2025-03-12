@@ -10,19 +10,21 @@ function PostForm({ post }) {
     useForm({
       defaultValues: {
         title: post?.title || "",
-        slug: post?.slug || "",
+        slug: post?.$id || "",
         content: post?.content || "",
         status: post?.status || "active",
       },
     });
 
-  const navigae = useNavigate();
+  const hello = () => console.log("hello");
+
+  const navigate = useNavigate();
   const userData = useSelector((state) => state.auth.userData);
 
   const submit = async (data) => {
     if (post) {
       const file = data.image[0]
-        ? appwriteService.uploadFile(data.image[0])
+        ? await appwriteService.uploadFile(data.image[0])
         : null;
 
       if (file) {
@@ -34,44 +36,43 @@ function PostForm({ post }) {
         featuredImage: file ? file.$id : undefined,
       });
       if (dbPost) {
-        navigae("/post/${dbPost.$id}");
+        // navigate("/post/${dbPost.$id}");
+        navigate(`/post/${dbPost.$id}`);
       }
     } else {
       const file = await appwriteService.uploadFile(data.image[0]);
       if (file) {
-        const feildId = file.$id;
-        data.featuredImage = feildId;
+        const fileId = file.$id;
+        data.featuredImage = fileId;
         const dbPost = await appwriteService.createPost({
           ...data,
           userId: userData.$id,
         });
         if (dbPost) {
-          navigae("/post/${dbPost.$id}");
+          navigate("/post/${dbPost.$id}");
         }
       }
     }
   };
 
   const slugTransform = useCallback((value) => {
-    if (value && typeof value === "string") {
+    if (value && typeof value === "string")
       return value
         .trim()
         .toLowerCase()
-        .replace(/^[a-zA-Z\d\s]+/g, "-")
+        .replace(/[^a-zA-Z\d\s]+/g, "-")
         .replace(/\s/g, "-");
-    }
+
     return "";
   }, []);
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
-      if (name) {
-        setValue("slug", slugTransform(value.title, { shouldValidate: true }));
+      if (name === "title") {
+        setValue("slug", slugTransform(value.title), { shouldValidate: true });
       }
     });
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, [watch, slugTransform, setValue]);
 
   return (
@@ -126,8 +127,9 @@ function PostForm({ post }) {
         />
         <Button
           type="submit"
-          bgColor={post ? "bg-green-500" : undefined}
+          // bgColor={post ? "bg-green-500 hover:bg-green-300" : undefined}
           className="w-full"
+          onSubmit={hello}
         >
           {post ? "Update" : "Submit"}
         </Button>

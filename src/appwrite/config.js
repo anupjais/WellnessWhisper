@@ -47,7 +47,7 @@ export class Service {
         }
       );
     } catch (error) {
-      console.log("appWrite error updatePost :: ", error);
+      console.log("AppWrite error updatePost :: ", error);
     }
   }
 
@@ -67,7 +67,7 @@ export class Service {
 
   async getPost(slug) {
     try {
-      await this.databases.getDocument(
+      return await this.databases.getDocument(
         conf.appwriteDatabaaseId,
         conf.appwriteCollectionId,
         slug
@@ -95,7 +95,7 @@ export class Service {
     try {
       return await this.bucket.createFile(
         conf.appwriteBucketId,
-        ID.unique,
+        ID.unique(),
         file
       );
     } catch (error) {

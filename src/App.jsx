@@ -30,7 +30,9 @@ function App() {
     >
       <div className="w-full block">
         <Header />
-        <main>Todo: {/* {Outlet} */}</main>
+        <main className="min-h-screen">
+          <Outlet />
+        </main>
         <Footer />
       </div>
     </div>
